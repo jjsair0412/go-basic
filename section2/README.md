@@ -126,3 +126,89 @@ func main(){
 }
 ```
 
+## **열거형 - iota 예약어**
+golang에서 연속되는 값을 가질 때 사용합니다.
+- enum과 비슷
+
+주로 상수를 사용하는 일정한 규칙에 따라 숫자를 계산 및 증가시키는 묶음이라고 볼 수 있습니다.
+
+```golang
+func main() {
+
+	// 열거형
+	// 상수를 사용하며 일정 규칙을 가지고 , 숫자가 증가된다.
+	const (
+		Jan = 1
+		Feb = 2
+		Mar = 3
+		Apr = 4
+		May = 5
+		Jun = 6
+	)
+
+	fmt.Println(Jan, Feb, Mar, Apr, May, Jun)
+
+}
+```
+
+이럴 때 , **iota** 예약어를 사용해서 증감시킬 수 있습니다.
+```golang
+func main() {
+
+	// 열거형
+	// iota 예약어 사용
+	const (
+		A = iota
+		B
+		C
+	)
+
+	// 결과 : 0 1 2
+	fmt.Println(A, B, C)
+
+	const (
+		D = iota * 10
+		E
+		F
+	)
+
+	// 결과 : 0 10 20
+	fmt.Println(D, E, F)
+}
+```
+
+_ 를 통해서 , 특정 값을 생략하여 사용할 수 도 있습니다.
+- 중간도 가능 .
+- 그러나 값은 가지고 있다.
+```golang
+func main() {
+	const (
+		_ = iota // 0
+		A        // 1
+		B        // 2
+		C        // 3
+		_        // 스킵
+		D        // 5
+	)
+
+	const (
+		_        = iota + 0.75*2 // 0 + 0.75 * 2
+		DEFAULT                  // 1 + 0.75 * 2
+		SIVER                    // 2 + 0.75 * 2
+		_                        // 생략
+		PLATINUM                 // 4 + 0.75 * 2
+
+	)
+
+	/*
+	결과
+	Default :  2.5
+	Slver :  3.5
+	platinum :  5.5
+	*/
+	
+	fmt.Println("Default : ", DEFAULT)
+	fmt.Println("Slver : ", SIVER)
+	fmt.Println("platinum : ", PLATINUM)
+}
+```
