@@ -281,3 +281,190 @@ func main() {
 
 ```
 
+## 5. 문자열
+### 5.1 golang에서의 문자열 사용
+golang은 문자열을 큰 따옴표 "" 또는 `` 으로 구분합니다.
+
+**golang은 문자에 char 타입은 제공하지 않습니다.**
+
+그대신 rune(int32)로 문자 코드 값으로 string 기능을 제공하고 있습니다.
+
+문자열은 작은따옴표 '' 로 작성할 수 도 있습니다.
+
+자주 사용하는 escape 문은 다음과 같습니다.
+- \\ , \' , \"  , \a(콘솔벨) , \b(백스페이스) , \f(쪽바꿈) , \n(줄바꿈) , \r(복귀) , \t(탭) .. 등
+
+excape문 때문에 아래처럼 작성하면 golang에서 에러납니다.
+
+따라서 다음처럼 사용해야 합니다.
+```golang
+package main
+
+import (
+	"fmt"
+	_ "unicode/utf8"
+)
+
+func main() {
+	// golang에서 다음과 같이 경로를 작성하면 escape 문이 겹쳐서 , 에러난다.
+	// var str1 string = "c:\go_study\src\"
+
+	// 아래 경로처럼 작성해야 아래 경로가 됩니다.
+	// c:\go_study\src\
+	var str1 string = "c:\\go_study\\src\\"
+
+	str2 := `c:\go_study\src\`
+
+	fmt.Println("str1 : ", str1)
+	fmt.Println("str2 : ", str2)
+	/*
+	   결과 :
+	   str1 :  c:\go_study\src\
+	   str2 :  c:\go_study\src\
+	*/
+}
+
+```
+#### 5.1.1 golang의 문자열 길이 구하기
+golang에서는 string , 문자열의 길이와 크기 구하는것을 정확하게 지원합니다.
+
+1. len() 함수
+len() 함수는 파라미터값으로 받은 변수의 바이트 크기를 반환합니다.
+
+```golang
+{
+	var str3 string = "Hello, world!"
+	var str4 string = "안녕하세요."
+
+	fmt.Println("str3 크기 : ", len(str3))
+	fmt.Println("str4 크기 : ", len(str4))
+/*
+	str3 길이 :  13 . 영문 , 특문 , 띄어쓰기는 1byte 필요
+	str4 길이 :  16 . 한글은 한글자당 3byte 필요
+*/
+}
+```
+
+len() 함수로 길이를 반환하기 위해선 아래처럼 사용해도 무관합니다.
+```golang
+fmt.Println("str4 길이 : ", len([]rune(str4)))
+```
+
+
+2. RuneCountInString() 함수
+"unicode/utf8" 패키지의 RuneCountInString() 함수는 파라미터의 길이를 반환합니다.
+
+```golang
+package main
+
+import (
+	"fmt"
+	"unicode/utf8"
+)
+
+func main() {
+
+	var str3 string = "Hello, world!"
+	var str4 string = "안녕하세요."
+
+
+	fmt.Println("str3 길이 : ", utf8.RuneCountInString(str3))
+	fmt.Println("str4 길이 : ", utf8.RuneCountInString(str4))
+}
+
+```
+
+### 5.2 golang에서의 문자열 표현
+golang은 기본적으로 UTF-8로 인코딩 되어있습니다.
+- byte 수를 주의 ( 특징알고 잘 사용해야 함 )
+
+또한 string 타입은 배열과같이 메모리에 저장되기에 아래처럼 끊어서 출력시킬 수 있습니다.
+
+또한 string을 인덱스값만 뽑으면 , 아스키코드로 출력되게 됩니다.
+```golang
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	var str1 string = "Golang"
+	var str2 string = "World"
+	var str3 string = "고프로그래밍"
+
+	fmt.Println("ex1 : ", str1[0], str1[1], str1[2], str1[3], str1[4], str1[5])
+	fmt.Println("ex2 : ", str2[0], str2[1], str2[2], str2[3], str2[4])
+	fmt.Println("ex3 : ", str3[0], str3[1], str3[2], str3[3], str3[4], str3[5], str3[6])
+
+	fmt.Printf("ex1 : %c %c %c %c %c %c \n", str1[0], str1[1], str1[2], str1[3], str1[4], str1[5])
+	fmt.Printf("ex2 : %c %c %c %c %c \n", str2[0], str2[1], str2[2], str2[3], str2[4])
+	fmt.Printf("ex3 : %c %c %c %c %c %c %c \n", str3[0], str3[1], str3[2], str3[3], str3[4], str3[5], str3[6])
+/*
+결과
+ex1 :  71 111 108 97 110 103
+ex2 :  87 111 114 108 100
+ex3 :  234 179 160 237 148 132 235
+여기까지 아스키코드로 뽑아짐
+
+ex1 : G o l a n g
+ex2 : W o r l d
+ex3 : ê ³   í   ë
+ex3번 한글깨짐
+*/
+}
+
+```
+
+위 예제는 한글이 깨지는데 , 한글이 안 깨지게하기 위해선 배열형 rune()을 사용해서 변수 대입 후 printf로 출력하면 깨지지 않습니다.
+
+```golang
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	var str1 string = "Golang"
+	var str2 string = "World"
+	var str3 string = "고프로그래밍"
+
+	fmt.Println("ex1 : ", str1[0], str1[1], str1[2], str1[3], str1[4], str1[5])
+	fmt.Println("ex2 : ", str2[0], str2[1], str2[2], str2[3], str2[4])
+	fmt.Println("ex3 : ", str3[0], str3[1], str3[2], str3[3], str3[4], str3[5], str3[6])
+
+	fmt.Printf("ex1 : %c %c %c %c %c %c \n", str1[0], str1[1], str1[2], str1[3], str1[4], str1[5])
+	fmt.Printf("ex2 : %c %c %c %c %c \n", str2[0], str2[1], str2[2], str2[3], str2[4])
+	fmt.Printf("ex3 : %c %c %c %c %c %c %c \n", str3[0], str3[1], str3[2], str3[3], str3[4], str3[5], str3[6])
+	/*
+	   결과
+	   ex1 :  71 111 108 97 110 103
+	   ex2 :  87 111 114 108 100
+	   ex3 :  234 179 160 237 148 132 235
+	   ex1 : G o l a n g
+	   ex2 : W o r l d
+	   ex3 : ê ³   í   ë
+	*/
+	conStr := []rune(str3)
+	fmt.Printf("ex3 : %c %c %c %c %c %c \n", conStr[0], conStr[1], conStr[2], conStr[3], conStr[4], conStr[5])
+	/*
+	   ex1 :  71 111 108 97 110 103
+	   ex2 :  87 111 114 108 100
+	   ex3 :  234 179 160 237 148 132 235
+	   ex1 : G o l a n g
+	   ex2 : W o r l d
+	   ex3 : ê ³   í   ë
+	   ex3 : 고 프 로 그 래 밍
+	*/
+}
+```
+
+golang 문자열은 배열이기 때문에 그 자체로 반복문으로 사용할 수 있습니다.
+```golang
+	var str1 string = "Golang"
+	for i, char := range str1 {
+		fmt.Printf("ex3 : %c(%d)\t", char, i)
+		// 결과 : ex3 : G(0)      ex3 : o(1)      ex3 : l(2)      ex3 : a(3)      ex3 : n(4)      ex3 : g(5)
+	}
+```
