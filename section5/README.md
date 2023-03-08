@@ -468,3 +468,144 @@ golang 문자열은 배열이기 때문에 그 자체로 반복문으로 사용�
 		// 결과 : ex3 : G(0)      ex3 : o(1)      ex3 : l(2)      ex3 : a(3)      ex3 : n(4)      ex3 : g(5)
 	}
 ```
+
+
+## 6. golang 문자열 연산
+### 6.1 golang 문자열 연산의 종류
+1. 추출
+2. 비교
+3. 조합 ( 결합 )
+
+#### 6.1.1 추출
+golang의 문자열은 배열입니다.
+
+파이썬처럼 특정 문자열의 순서만 꺼내올 수 있습니다.
+- 슬라이싱 처리 가능
+- 슬라이싱 처리하면 문자가 출력되고 , 해당 순서만출력하면 해당 문자의 코드값만 출력됩니다. ( 정수 )
+```golang
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	var str1 string = "Golang"
+	var str2 string = "world"
+
+	fmt.Println("ex1 : ", str1[0:3], str1[0]) // str1의 0~2번째 까지 추출 , 0번째 추출
+	fmt.Println("ex1 : ", str2[3:], str2[0])  // 빈칸은 끝까지라는 의미. str2의0부터 끝까지 , 0번째 추출
+	fmt.Println("ex1 : ", str2[:4])           // 처음부터 4번째까지 출력
+	fmt.Println("ex1 : ", str1[1:3])          // 1번 인덱스부터 3번인덱스까지 출력
+
+
+/*
+결과 :
+ex1 :  Gol 71
+ex1 :  ld 119
+ex1 :  worl
+ex1 :  ol
+*/
+}
+
+```
+
+#### 6.1.2 비교
+golang 문자열 비교는 아래와 같습니다.
+
+특이사항은 , 문자열 크기를 비교하는 로직 ( > , < ) 을 사용하면 , golang 문자열은 아스키 코드값이 반환되기 때문에 아래와 같은 결과가 출력됩니다.
+
+```golang
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	str1 := "Golang" 
+	str2 := "World"
+
+	fmt.Println("ex1 : ", str1 == str2) // false
+	fmt.Println("ex2 : ", str1 != str2) // true
+
+	// 아스키코드에 의한 사전식 비교 진행함.
+	fmt.Println("ex3 : ", str1 > str2) // false !
+	fmt.Println("ex3 : ", str1 < str2) // true
+	
+}
+```
+
+#### 6.1.3 조합 (결합)
+golang에서 문자열 결합할 때 , 아래와 같은 방법들이 있습니다.
+1. 결합 : 일반연산
+2. 결합 : join
+
+그러나 join 결합을 사용하는것이 성능상 더 좋기 때문에 추천하는 방법입니다.
+
+##### 6.1.3.1 일반연산
+아래처럼 그냥 더하기로 문자열 연산을 할 수 있습니다.
+
+그러나 string은 한번 선언하면 메모리에서 수정이 불가하기에 , 계속 생성 ( new ) 합니다.
+- 메모리 누수
+
+이런 일반연산으로 해도 문제는 없지만 성능을 최대한으로 사용하기 위해선 , join을 사용해야 합니다.
+```golang
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	str1 := "Instructions for downloading and installing Go." +
+		"A brief Hello, World tutorial to get started. Learn a bit about Go code, tools, packages, and modules." +
+		"Tutorial: Create a module"
+	str2 := "A tutorial of short topics introducing functions, error handling, arrays, maps, unit testing, and compiling."
+
+	fmt.Println("ex1 : ", str1+str2)
+/*
+결과 :
+ex1 :  Instructions for downloading and installing Go.A brief Hello, World tutorial to get started. Learn a bit about Go code, tools, packages, and modules.Tutorial: Create a moduleA tutorial of short topics introducing functions, error handling, arrays, maps, unit testing, and compiling.
+*/
+}
+```
+
+##### 6.1.3.2 join
+golang에서 슬라이스 형과 append 메서드를 사용해서 join 연산을 할 수 있습니다.
+
+설명은 주석으로 대신합니다.
+
+```golang
+package main
+
+import (
+	"fmt"
+	"strings"
+)
+
+func main() {
+	str1 := "Instructions for downloading and installing Go." +
+		"A brief Hello, World tutorial to get started. Learn a bit about Go code, tools, packages, and modules." +
+		"Tutorial: Create a module"
+	str2 := "A tutorial of short topics introducing functions, error handling, arrays, maps, unit testing, and compiling."
+
+	strSet := []string{} // 슬라이스형 선언
+
+	// strSet에 append로 추가할 문자열 하나씩 넣어줌,
+	// 파라미터는 슬라이스형의 string 변수명과 합칠문자 순서대로 들어감
+	strSet = append(strSet, str1)
+	strSet = append(strSet, str2)
+
+	// 사용할 땐 , strings.Join() 메서드 사용
+	// 파라미터로 슬라이스형 변수와 , 각 문자열 중간중간에 넣을 문자를 넣어줌.
+	// 넣을 문자는 빈칸으로 둬도 상관없음.
+	fmt.Println("ex2 : ", strings.Join(strSet, "---"))
+}
+
+```
+
+결과는 아래와 같습니다.
+```bash 
+ex2 :  Instructions for downloading and installing Go.A brief Hello, World tutorial to get started. Learn a bit about Go code, tools, packages, and modules.Tutorial: Create a module---A tutorial of short topics introducing functions, error handling, arrays, maps, unit testing, and compiling.
+```
