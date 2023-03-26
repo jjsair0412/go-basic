@@ -194,3 +194,291 @@ func main() {
 	fmt.Println(a, b)
 }
 ```
+
+## 4. 가변인자
+함수의 매개변수 개수가 동적으로 변할 때 가변인자 함수를 사용합니다.
+
+### 4.1 기본 사용방법
+기본적으로 가변인자 함수를 선언하고 사용하는 방법은 , ...을 사용합니다.
+```golang
+import "fmt"
+
+// 매개변수를 선언할 때 , 아래처럼 ...을 넣어준다면 ,
+// int형 몇개가 들어와도 상관이 없다는 의미이다.
+// 가변형으로 매개변수를 받을 수 있다.
+func multiply(n ...int) int {
+	tot := 1
+	for _, value := range n {
+		tot *= value
+	}
+
+	return tot
+}
+
+func sum(n ...int) int {
+	tot := 0
+	for _, value := range n {
+		tot += value
+	}
+
+	return tot
+}
+
+func prtWord(msg ...string) {
+	for _, value := range msg {
+		fmt.Println("ex2 : ", value)
+	}
+}
+
+func main() {
+	// 1x2x3 의 결과 6 출력
+	x := multiply(1, 2, 3)
+	fmt.Println(x)
+
+	fmt.Println()
+
+	// 1~10까지 더한 결과 55 출력
+	y := sum(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+	fmt.Println(y)
+
+	fmt.Println()
+
+	/*
+		결과 :
+		ex2 :  a
+		ex2 :  apple
+		ex2 :  test
+		ex2 :  golang
+		ex2 :  seoul
+	*/
+	prtWord("a", "apple", "test", "golang", "seoul")
+
+	fmt.Println()
+}
+```
+
+### 4.2 가변인자 함수 매개변수에 슬라이스 및 배열 넣기
+슬라이스나 배열을 가변인자 함수에 집어넣을 수도 있습니다.
+
+아래 예시처럼 ... 을 사용합니다.
+```golang
+func multiply(n ...int) int {
+	tot := 1
+	for _, value := range n {
+		tot *= value
+	}
+
+	return tot
+}
+
+func main() {
+	a := []int{1, 2, 3, 4, 5}
+
+	// 슬라이스 a의 인덱스 0번부터 차례대로 들어간다.
+	m := multiply(a...)
+	n := sum(a...)
+
+	/*
+		결과 :
+		ex3 :  120
+		ex3 :  15
+	*/
+	fmt.Println("ex3 : ", m)
+	fmt.Println("ex3 : ", n)
+}
+```
+
+## 5. 함수를 변수에 할당해서 사용하기
+### 5.1 슬라이스에 할당
+슬라이스 인덱스안에 함수를 할당하는 방법입니다.
+
+```golang
+import "fmt"
+
+func multiply(x, y int) (r int) {
+	r = x * y
+	return r
+}
+
+func sum(x, y int) (r int) {
+	r = x + y
+	return r
+}
+
+func main() {
+
+	// 0번 인덱스에 multiply , 1번 인덱스에 sum을 넣습니다.
+	// func 타입의 값을 가진 슬라이스를 선언하고 , int형 두개를 매개변수로
+	// 가지며 return type이 int형 한개를 가지는 애들을 묶을 수 있습니다.
+	f := []func(int, int) int{multiply, sum}
+
+	// 0번째 , 1번째 함수에 10. 10을 매개변수로 넣음
+	a := f[0](10, 10) // a := multiply(10,10) 과 동일
+	b := f[1](10, 10) // b := sum(10,10) 과 동일
+
+	fmt.Println("ex1 : ", a, f[0](10, 10))
+	fmt.Println("ex1 : ", b, f[1](10, 10))
+	/*
+	   결과 :
+	   ex1 :  100 100
+	   ex1 :  20 20
+	*/
+
+}
+```
+
+### 5.2 변수에 할당
+변수에 함수를 할당하는 방법입니다.
+```golang
+
+func multiply(x, y int) (r int) {
+	r = x * y
+	return r
+}
+
+func sum(x, y int) (r int) {
+	r = x + y
+	return r
+}
+
+func main() {
+	// 변수에 할당하는 방법입니다.
+	// int형 매개변수 두개와 , return type을 int로 갖는 함수인 multiply를
+	// f1에 넣습니다.
+	var f1 func(int, int) int = multiply
+	f2 := sum // 이렇게 선언해도 무관합니다.
+
+	fmt.Println("ex2 : ", f1(10, 10))
+	fmt.Println("ex2 : ", f2(10, 10))
+	
+	/*
+	   결과 :
+	   ex3 :  100
+	   ex3 :  20
+	*/
+
+}
+```
+
+
+### 5.3 맵에 할당
+map의 각 key에 value로 함수를 할당하는 방법입니다.
+
+```golang
+
+func multiply(x, y int) (r int) {
+	r = x * y
+	return r
+}
+
+func sum(x, y int) (r int) {
+	r = x + y
+	return r
+}
+
+func main() {
+	// map에 할당하는 방법입니다.
+	// key로 string을 갖고 , value로 매개변수 int 두개를 갖고 return값이 int 하나인
+	// 함수를 가지는 맵을 선언합니다.
+	m := map[string]func(int, int) int{
+		"mul_func": multiply,
+		"sum_func": sum,
+	}
+
+	// map의 key를 통해서 함수를 꺼내고 매개변수를 넣어서 사용합니다.
+	fmt.Println("ex3 : ", m["mul_func"](10, 10))
+	fmt.Println("ex3 : ", m["sum_func"](10, 10))
+	/*
+	   결과 :
+	   ex3 :  100
+	   ex3 :  20
+	*/
+}
+```
+
+
+## 6. 재귀함수 (Recursion)
+재귀함수를 사용하면 , 프로그램이 보기쉽고 코드가 간결해지며 오류 수정이 용이해집니다.
+
+그러나 코드를 이해하기 어렵고 , 메모리를 많이 사용합니다.
+- 무한루프에 빠질 가능성이 있음
+
+```golang
+import "fmt"
+
+func fact(n int) int {
+	if n == 0 {
+		return 1
+	}
+	return n * fact(n-1)
+}
+
+func prtHello(n int) {
+	if n == 0 {
+		return
+	}
+	fmt.Println("ex2 : (", n, ")", "hi!")
+	prtHello(n - 1)
+}
+
+func main() {
+	x := fact(5)
+
+	fmt.Println("ex1 : ", x)
+	// 결과 : ex1 :  120
+
+	prtHello(10)
+	/*
+	   결과 :
+	   ex2 : ( 10 ) hi!
+	   ex2 : ( 9 ) hi!
+	   ex2 : ( 8 ) hi!
+	   ex2 : ( 7 ) hi!
+	   ex2 : ( 6 ) hi!
+	   ex2 : ( 5 ) hi!
+	   ex2 : ( 4 ) hi!
+	   ex2 : ( 3 ) hi!
+	   ex2 : ( 2 ) hi!
+	   ex2 : ( 1 ) hi!
+	*/
+}
+```
+
+## 7. 익명함수
+주로 선언과 동시에 실행해야 할 때 사용합니다.
+
+```golang
+import "fmt"
+
+func main() {
+
+	// 익명함수는 아래처럼 사용합니다.
+	// js의 익명함수와 동일하게 이름이 없고 , 중괄호가 닫힌 뒤 () 소 괄호를 붙여야합니다.
+	func() {
+		fmt.Println("ex1 : anonymous func!")
+	}()
+	// 결과 : ex1 : anonymous func!
+
+	// js처럼 매개변수를 바로 넣기 위해 뒤에 () 소괄호 안에 변수 넣습니다.
+	msg := "hello golang"
+	func(n string) {
+		fmt.Println("ex2 : ", n)
+	}(msg)
+	// 결과 : ex2 :  hello golang
+
+	// 매개변수를 바로 넣으면서 함수를 사용해도 무관합니다.
+	func(x, y int) {
+		fmt.Println("ex3 : ", x+y)
+	}(10, 20)
+	// 결과 : ex3 :  30
+
+	// 실행과 동시에 짧은 선언으로 r 변수 안에 func 리턴값이 들어갑니다.
+	r := func(x, y int) int {
+		return x * y
+	}(10, 100)
+
+	fmt.Println("ex4 : ", r)
+
+	// 결과 : ex4 :  1000
+}
+```
