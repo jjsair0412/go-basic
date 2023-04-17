@@ -50,7 +50,8 @@ set GOROOT=C:\Program Files\Go
 ```
 
 ## package 만드는 방법
-package는 GOROOT 경로 밑에 /src에 위치해아 합니다.
+package는 GOROOT 경로 밑에 /src에 위치해아 합니다. -> go 1.11부터 변경됨. go.mod로 go path 외부에서도 가능. 아래 문서 참고
+- [GO언어에서_패키지_관리_전략](/Package_Management_Strategy/README.md)
 
 ```bash
 $ cd C:\Program Files\Go\src
